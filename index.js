@@ -27,6 +27,7 @@ async function run() {
     console.log("E-Pustok database connected");
     const database = client.db("folders");
     const writersCollection = database.collection("writers");
+    const booksCollection = database.collection("books");
 
     // Post Document
 
@@ -46,12 +47,40 @@ async function run() {
       res.json(result);
     });
 
+    app.post("/books", async (req, res) => {
+      const book = req.body;
+      const pic = req.files.image;
+      const picData = pic.data;
+      const encodedImage = picData.toString("base64");
+      const imageBuffer = Buffer.from(encodedImage, "base64");
+
+      const pdf = req.files.pdf;
+      const pdfData = pdf.data;
+      const encodedPdf = pdfData.toString("base64");
+      const pdfBuffer = Buffer.from(encodedPdf, "base64");
+
+      const booksData = {
+        book,
+        image: imageBuffer,
+        pdf: pdfBuffer,
+      };
+
+      const result = await booksCollection.insertOne(booksData);
+      res.json(result);
+    });
+
     // Get Document
 
     app.get("/writers", async (req, res) => {
       const cursor = writersCollection.find({});
       const writers = await cursor.toArray();
       res.json(writers);
+    });
+
+    app.get("/books", async (req, res) => {
+      const cursor = booksCollection.find({});
+      const books = await cursor.toArray();
+      res.json(books);
     });
 
     // End
@@ -68,15 +97,3 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Running E-Pustok server on link http://localhost:5000`);
 });
-
-//   const data = req.body;
-//   const file = req.files.file;
-//   const newImg = file.data;
-//   const encImg = newImg.toString("base64");
-//   const image = {
-//     contentType: file.mimetype,
-//     size: file.size,
-//     img: Buffer.from(encImg, "base64"),
-//   };
-//   const result = await projectsCollection.insertOne({ data, image });
-//   res.json(result);
