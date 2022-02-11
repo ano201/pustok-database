@@ -54,15 +54,9 @@ async function run() {
       const encodedImage = picData.toString("base64");
       const imageBuffer = Buffer.from(encodedImage, "base64");
 
-      const pdf = req.files.pdf;
-      const pdfData = pdf.data;
-      const encodedPdf = pdfData.toString("base64");
-      const pdfBuffer = Buffer.from(encodedPdf, "base64");
-
       const booksData = {
         book,
         image: imageBuffer,
-        pdf: pdfBuffer,
       };
 
       const result = await booksCollection.insertOne(booksData);
